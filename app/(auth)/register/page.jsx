@@ -89,12 +89,7 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2.5 no-underline">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-base font-display">PS</span>
-            </div>
-            <span className="text-xl font-bold text-white font-display">PostSaathi</span>
-          </Link>
+
           <h1 className="mt-6 text-2xl sm:text-3xl font-bold text-white font-display">
             Create your account
           </h1>
@@ -224,9 +219,7 @@ export default function RegisterPage() {
           {/* Perks */}
           <div className="mt-6 pt-5 border-t border-white/5 space-y-2">
             {[
-              'Free forever — no credit card needed',
-              'AI caption generation included',
-              'Twitter & LinkedIn supported',
+          
             ].map((perk) => (
               <div key={perk} className="flex items-center gap-2 text-xs text-white/30">
                 <CheckCircle2 size={12} className="text-green-400 shrink-0" />

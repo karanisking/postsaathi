@@ -41,10 +41,10 @@ export default function LandingPage() {
 
   const features = [
     { icon: CalendarDays, title: 'Visual Calendar',       desc: 'See all posts at a glance. Color-coded by status — scheduled, published, or failed.' },
-    { icon: Sparkles,     title: 'AI Caption Generator',  desc: 'Powered by Gemini AI. Enter a topic, pick a tone, get 3 ready-to-use captions instantly.' },
+    { icon: Sparkles,     title: 'AI Caption Generator',  desc: 'Powered by Groq AI. Enter a topic, pick a tone, get 3 ready-to-use captions instantly.' },
     { icon: Zap,          title: 'Post Now or Schedule',  desc: 'Publish immediately or schedule for the perfect moment across all platforms.' },
-    { icon: Globe2,       title: 'Multi-Platform',        desc: 'Twitter/X and LinkedIn supported. Connect once, manage everything from one dashboard.' },
-    { icon: Clock,        title: 'Smart Scheduling',      desc: 'Our cron system checks every minute and publishes your posts exactly on time.' },
+    { icon: Globe2,       title: 'Multi-Platform',        desc: 'LinkedIn supported. Connect once, manage everything from one dashboard.' },
+    { icon: Clock,        title: 'Smart Scheduling',      desc: 'Our cron system checks everyday at 12 AM.' },
     { icon: Shield,       title: 'Secure by Default',     desc: 'JWT auth, httpOnly cookies, tokens never exposed. Your accounts stay safe.' },
   ]
 
@@ -146,11 +146,7 @@ export default function LandingPage() {
       <section className="relative z-10 pt-20 pb-24 md:pt-28 md:pb-32 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm mb-8">
-            <Sparkles size={13} />
-            <span>AI-powered social media scheduling</span>
-          </div>
-
+    
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
             Schedule smarter,{' '}
             <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
@@ -159,7 +155,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
-            PostSaathi helps you write, schedule, and publish posts to Twitter and LinkedIn —
+            PostSaathi helps you write, schedule, and publish posts to LinkedIn —
             from one beautiful dashboard. With AI captions that actually sound like you.
           </p>
 
@@ -238,26 +234,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stats ───────────────────────────────────── */}
-      <section className="relative z-10 py-14 px-4 sm:px-6 lg:px-8 border-y border-white/5">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
-          {[
-            { value: '2',    label: 'Platforms' },
-            { value: 'AI',   label: 'Caption generation' },
-            { value: '1min', label: 'Cron precision' },
-            { value: 'Free', label: 'No credit card' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
-                {s.value}
-              </div>
-              <div className="text-xs sm:text-sm text-white/35">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+  
 
       {/* ── Platforms ───────────────────────────────── */}
-      <section id="platforms" className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
+      <section id="platforms" className="relative z-10 py-0 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <Badge className="mb-6 bg-blue-500/10 text-blue-300 border-blue-500/30 hover:bg-blue-500/10">
             Platforms
@@ -269,17 +249,8 @@ export default function LandingPage() {
             Connect your accounts once. PostSaathi handles the rest.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
-            <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 hover:border-sky-500/30 hover:bg-sky-500/[0.03] transition-all group">
-              <div className="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-sky-500/20 transition-all">
-                <Twitter size={22} className="text-sky-400" />
-              </div>
-              <h3 className="font-display font-semibold text-white mb-2">Twitter / X</h3>
-              <p className="text-sm text-white/40">Full OAuth 2.0. Post tweets with images, up to 280 chars.</p>
-              <div className="mt-4 inline-flex items-center gap-1.5 text-xs text-green-400 bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20">
-                <CheckCircle2 size={11} /> Live in V1
-              </div>
-            </div>
+          <div className="grid grid-cols-1 max-w-md mx-auto">
+
 
             <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 hover:border-blue-700/30 hover:bg-blue-700/[0.03] transition-all group">
               <div className="w-12 h-12 rounded-2xl bg-blue-700/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-700/20 transition-all">
