@@ -1,9 +1,9 @@
 {
-    "installCommand": "npm install --legacy-peer-deps",
-    "crons": [
-      {
-        "path": "/api/publish/cron",
-        "schedule": "* * * * *"
-      }
-    ]
-  }
+  "installCommand": "npm install --legacy-peer-deps",
+  "crons": [
+    {
+      "path": "/api/publish/cron",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
