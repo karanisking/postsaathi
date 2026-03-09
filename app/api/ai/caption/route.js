@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 import { withAuth } from '@/lib/middleware'
 import { captionSchema } from '@/lib/validators'
-import { generateCaptions } from '@/lib/gemini'
+import { generateCaptions } from '@/lib/groq'  // ✅ changed from gemini to groq
 
-// POST /api/ai/caption
 export const POST = withAuth(async (request) => {
   try {
     let body
@@ -16,7 +15,6 @@ export const POST = withAuth(async (request) => {
       )
     }
 
-    // Validate
     const result = captionSchema.safeParse(body)
     if (!result.success) {
       return NextResponse.json(
@@ -27,14 +25,13 @@ export const POST = withAuth(async (request) => {
 
     const { topic, platforms, tone } = result.data
 
-    // Generate 3 captions via Gemini
     const captions = await generateCaptions({ topic, platforms, tone })
 
     return NextResponse.json({ success: true, captions })
   } catch (error) {
-    console.error('Error whileposting caption', error)
+    console.error('[CAPTION ERROR]', error)
     return NextResponse.json(
-      { success: false, message: 'Failed to generate captions' },
+      { success: false, message: error.message || 'Failed to generate captions' },
       { status: 500 }
     )
   }

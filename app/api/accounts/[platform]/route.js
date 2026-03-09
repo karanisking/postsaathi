@@ -8,38 +8,21 @@ export const DELETE = withAuth(async (request, context) => {
   try {
     const { platform } = await context.params
 
-    const validPlatforms = ['twitter', 'linkedin']
-    // const validPlatforms = ['twitter', 'linkedin', 'instagram', 'facebook'] // V2
-
-    if (!validPlatforms.includes(platform)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid platform' },
-        { status: 400 }
-      )
-    }
-
     await connectDB()
 
-    const account = await Account.findOneAndDelete({
+    await Account.findOneAndDelete({
       userId:   request.user.userId,
       platform,
     })
 
-    if (!account) {
-      return NextResponse.json(
-        { success: false, message: `No connected ${platform} account found` },
-        { status: 404 }
-      )
-    }
-
     return NextResponse.json({
       success: true,
-      message: `${platform} account disconnected successfully`,
+      message: `${platform} disconnected`,
     })
   } catch (error) {
-    console.error('[ACCOUNT DELETE ERROR]', error)
+    console.error('[DISCONNECT ERROR]', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Failed to disconnect account' },
       { status: 500 }
     )
   }

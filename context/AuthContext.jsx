@@ -12,57 +12,47 @@ export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // ── Logout ───────────────────────────────────────────
   const logout = useCallback(async (showToast = false) => {
-    try {
-      await authApi.logout()
-    } catch {
-      // ignore
-    } finally {
-      setUser(null)
-      if (showToast) {
-        toast.error('Session expired — please login again')
-      }
-      router.push('/login')
-    }
+    try { await authApi.logout() } catch {}
+    setUser(null)
+    if (showToast) toast.error('Session expired — please login again')
+    router.push('/login')
   }, [router])
 
-  // ── Register global logout handler for api.js ────────
-  // When any API call gets 401 → this fires automatically
   useEffect(() => {
     setGlobalLogout(() => logout(true))
   }, [logout])
 
-  // ── Load user on app start ───────────────────────────
   useEffect(() => {
-    const initAuth = async () => {
+    const init = async () => {
       try {
-        // Cookie is sent automatically — if valid, returns user
         const data = await authApi.me()
         setUser(data.user)
       } catch {
-        // 401 or network error — user not logged in
         setUser(null)
       } finally {
         setLoading(false)
       }
     }
-
-    initAuth()
+    init()
   }, [])
 
-  // ── Login ────────────────────────────────────────────
+  // ✅ login — success toast here, errors thrown back to page
   const login = useCallback(async (email, password) => {
     const data = await authApi.login({ email, password })
+    // Only reaches here if API call succeeded
     setUser(data.user)
+    toast.success(`Welcome back, ${data.user.name}! 👋`)
     router.push('/dashboard')
     return data
   }, [router])
 
-  // ── Register ─────────────────────────────────────────
+  // ✅ register — success toast here, errors thrown back to page
   const register = useCallback(async (name, email, password) => {
     const data = await authApi.register({ name, email, password })
+    // Only reaches here if API call succeeded
     setUser(data.user)
+    toast.success(`Welcome to PostSaathi, ${data.user.name}! 🎉`)
     router.push('/dashboard')
     return data
   }, [router])
@@ -82,7 +72,7 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  const authcont = useContext(AuthContext)
-  if (!authcont) throw new Error('useAuth must be used inside AuthProvider')
-  return authcont
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
+  return ctx
 }

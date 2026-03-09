@@ -80,4 +80,4 @@ AccountSchema.index(
   { unique: true }
 )
 
-export default accountModel =  mongoose.model('Account', AccountSchema)
+export default mongoose.models.Account || mongoose.model('Account', AccountSchema)

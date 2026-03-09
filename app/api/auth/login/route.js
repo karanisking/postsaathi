@@ -18,7 +18,7 @@ export async function POST(request) {
         { status: 400 }
       )
     }
-
+console.log(body);
     // 1. Validate
     const result = loginSchema.safeParse(body)
     if (!result.success) {
@@ -34,7 +34,7 @@ export async function POST(request) {
     await connectDB()
 
     // 3. Find user — select password back
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).select('+password')
     if (!user) {
       return NextResponse.json(
         { success: false, message: 'Invalid email or password' },
@@ -43,7 +43,8 @@ export async function POST(request) {
     }
 
     // 4. Compare password
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log(isMatch);
     if (!isMatch) {
       return NextResponse.json(
         { success: false, message: 'Invalid email or password' },

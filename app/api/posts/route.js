@@ -4,60 +4,46 @@ import Post from '@/models/Post'
 import { withAuth } from '@/lib/middleware'
 import { createPostSchema } from '@/lib/validators'
 
-// GET /api/posts?month=2026-03
-// Optional filters: ?month=2026-03&platform=twitter&status=scheduled
 export const GET = withAuth(async (request) => {
   try {
     await connectDB()
 
     const { searchParams } = new URL(request.url)
-    const month    = searchParams.get('month')    // required: format 2026-03
-    const platform = searchParams.get('platform') // optional: twitter | linkedin
-    const status   = searchParams.get('status')   // optional: scheduled | published | failed | draft
+    const month    = searchParams.get('month')
+    const platform = searchParams.get('platform')
+    const status   = searchParams.get('status')
 
-    // month is required
     if (!month) {
       return NextResponse.json(
-        { success: false, message: 'month query param is required (format: 2026-03)' },
+        { success: false, message: 'month param required (yyyy-MM)' },
         { status: 400 }
       )
     }
 
-    // Build filter
-    const filter = { userId: request.user.userId }
+    const [year, mon] = month.split('-').map(Number)
+    const start = new Date(year, mon - 1, 1)
+    const end   = new Date(year, mon, 1)
 
-    // Month range filter
-    const start = new Date(`${month}-01`)
-    const end   = new Date(start)
-    end.setMonth(end.getMonth() + 1)
-    filter.scheduledAt = { $gte: start, $lt: end }
-
-    // Optional platform filter
-    if (platform) {
-      filter.platforms = { $in: [platform] }
+    const query = {
+      userId:      request.user.userId,
+      createdAt:   { $gte: start, $lt: end },
     }
 
-    // Optional status filter
-    if (status) {
-      filter.status = status
-    }
+    if (platform) query.platforms = platform
+    if (status)   query.status    = status
 
-    const posts = await Post.find(filter)
-      .select('_id caption imageUrl platforms postType status scheduledAt publishedAt publishResults createdAt')
-      .sort({ scheduledAt: 1, createdAt: -1 })
-      .lean()
+    const posts = await Post.find(query).sort({ createdAt: -1 })
 
     return NextResponse.json({ success: true, posts })
   } catch (error) {
-    console.error('[POSTS GET ERROR]', error)
+    console.error('[GET POSTS ERROR]', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Failed to fetch posts' },
       { status: 500 }
     )
   }
 })
 
-// POST /api/posts — create post
 export const POST = withAuth(async (request) => {
   try {
     let body
@@ -65,7 +51,7 @@ export const POST = withAuth(async (request) => {
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { success: false, message: 'Request body is required' },
+        { success: false, message: 'Request body required' },
         { status: 400 }
       )
     }
@@ -79,47 +65,45 @@ export const POST = withAuth(async (request) => {
     }
 
     const {
-      caption,
-      imageUrl,
-      imagekitFileId,
-      platforms,   // array — ['twitter', 'linkedin']
-      postType,
-      scheduledAt,
+      platforms, caption, imageUrl,
+      imagekitFileId, postType, scheduledAt
     } = result.data
 
     await connectDB()
 
-    // scheduledAt must be in future if scheduled
-    if (postType === 'scheduled') {
-      if (new Date(scheduledAt) <= new Date()) {
-        return NextResponse.json(
-          { success: false, message: 'Scheduled time must be in the future' },
-          { status: 400 }
-        )
-      }
-    }
-
-    const status = postType === 'now' ? 'publishing' : 'scheduled'
-
+    // ✅ For 'now' posts — create as draft first, then publish
+    // For 'scheduled' posts — create as scheduled
     const post = await Post.create({
       userId:         request.user.userId,
       caption,
       imageUrl:       imageUrl       || null,
       imagekitFileId: imagekitFileId || null,
-      platforms,     // full array saved
+      platforms,
       postType,
-      status,
-      scheduledAt:   scheduledAt ? new Date(scheduledAt) : null,
+      status:         postType === 'now' ? 'draft' : 'scheduled',
+      scheduledAt:    postType === 'scheduled' ? new Date(scheduledAt) : null,
+      publishResults: { twitter: null, linkedin: null },
     })
 
-    return NextResponse.json(
-      { success: true, post },
-      { status: 201 }
-    )
+    // ✅ If postType is 'now' — immediately call publish API internally
+    if (postType === 'now') {
+      // Import publishers dynamically to avoid circular deps
+      const { publishPostNow } = await import('@/lib/publishHelper')
+      const updatedPost = await publishPostNow(post, request.user.userId)
+      return NextResponse.json({
+        success: true,
+        post:    updatedPost,
+      })
+    }
+
+    return NextResponse.json({
+      success: true,
+      post,
+    })
   } catch (error) {
-    console.error('[POST CREATE ERROR]', error)
+    console.error('[CREATE POST ERROR]', error)
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { success: false, message: 'Failed to create post' },
       { status: 500 }
     )
   }
