@@ -13,28 +13,42 @@ export async function POST(request) {
 
     await connectDB()
 
-    // Find all posts due for publishing
+    const now = new Date()
+
+    // Find ALL scheduled posts where scheduledAt <= now
+    // i.e. any post that was due before or exactly at this moment
     const duePosts = await Post.find({
       status:      'scheduled',
-      scheduledAt: { $lte: new Date() },
+      scheduledAt: { $lte: now },
     })
 
-    console.log(`[CRON] Found ${duePosts.length} posts to publish`)
+    console.log(`[CRON] Running at ${now.toISOString()}`)
+    console.log(`[CRON] Found ${duePosts.length} overdue/due posts to publish`)
 
     const results = []
     for (const post of duePosts) {
       try {
         const updated = await publishPostNow(post, post.userId.toString())
-        results.push({ id: post._id, status: updated.status })
+        results.push({ id: post._id, scheduledAt: post.scheduledAt, status: updated.status })
+        console.log(`[CRON] ✅ Published post ${post._id} (was scheduled for ${post.scheduledAt})`)
       } catch (err) {
-        console.error(`[CRON] Failed to publish ${post._id}:`, err)
-        results.push({ id: post._id, status: 'error' })
+        console.error(`[CRON] ❌ Failed to publish ${post._id}:`, err)
+        results.push({ id: post._id, scheduledAt: post.scheduledAt, status: 'error' })
       }
     }
 
-    return NextResponse.json({ success: true, processed: results.length, results })
+    return NextResponse.json({
+      success:   true,
+      ranAt:     now.toISOString(),
+      processed: results.length,
+      results,
+    })
   } catch (error) {
     console.error('[CRON ERROR]', error)
     return NextResponse.json({ success: false, message: error.message }, { status: 500 })
   }
+}
+
+export async function GET(request) {
+  return POST(request)
 }
