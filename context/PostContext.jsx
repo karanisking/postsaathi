@@ -8,22 +8,31 @@ const PostContext = createContext(null)
 
 export function PostProvider({ children }) {
   const [posts,   setPosts]   = useState([])
+  const [totals, setTotals] = useState({
+    scheduled: 0, published: 0, failed: 0, draft: 0, publishing: 0
+  })
   const [loading, setLoading] = useState(false)
 
   // ── Fetch posts for a month ─────────────────────────
-  const fetchPosts = useCallback(async (params = {}) => {
-    setLoading(true)
-    try {
-      const data = await postsApi.getAll(params)
-      setPosts(data.posts)
-      return data.posts
-    } catch (error) {
-      toast.error(error.message || 'Failed to fetch posts')
-      return []
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  // In fetchPosts — update to store totals
+const fetchPosts = useCallback(async (params = {}) => {
+  setLoading(true)
+  try {
+    const query = new URLSearchParams()
+    if (params.month)    query.set('month',    params.month)
+    if (params.platform) query.set('platform', params.platform)
+    if (params.status)   query.set('status',   params.status)
+
+    const data = await postsApi.getAll(query.toString())
+    setPosts(data.posts || [])
+    // ✅ Store totals if returned (only for month queries)
+    if (data.totals) setTotals(data.totals)
+  } catch (err) {
+    console.error(err)
+  } finally {
+    setLoading(false)
+  }
+}, [])
 
   // ── Create post ─────────────────────────────────────
   const createPost = useCallback(async (body) => {
@@ -92,6 +101,7 @@ export function PostProvider({ children }) {
     <PostContext.Provider value={{
       posts,
       loading,
+      totals,
       fetchPosts,
       createPost,
       updatePost,

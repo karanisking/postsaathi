@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
+import NextImage from 'next/image'
 
 export default function LoginPage() {
   const { login } = useAuth()
-  const [form,     setForm]     = useState({ email: '', password: '' })
-  const [errors,   setErrors]   = useState({})
-  const [loading,  setLoading]  = useState(false)
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
 
   const handleChange = (e) => {
@@ -25,29 +26,29 @@ export default function LoginPage() {
 
   const validate = () => {
     const errs = {}
-    if (!form.email)                           errs.email    = 'Email is required'
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email    = 'Invalid email address'
-    if (!form.password)                        errs.password = 'Password is required'
+    if (!form.email) errs.email = 'Email is required'
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = 'Invalid email address'
+    if (!form.password) errs.password = 'Password is required'
     return errs
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrors({})
-  
+
     const errs = validate()
     if (Object.keys(errs).length) {
       setErrors(errs)
       return
     }
-  
+
     setLoading(true)
     try {
       await login(form.email, form.password)
       // success handled in AuthContext (toast + redirect)
     } catch (err) {
       console.log('Login error caught:', err)
-  
+
       if (err.errors) {
         // Zod field validation errors from backend
         const fieldErrs = {}
@@ -81,8 +82,14 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2.5 no-underline">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-base font-display">PS</span>
+            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
+              <NextImage
+                src="/icon.png"
+                alt="PostSaathi logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-xl font-bold text-white font-display">PostSaathi</span>
           </Link>

@@ -26,7 +26,6 @@ const STATUS_FILTERS = [
 
 const PLATFORM_FILTERS = [
   { value: 'all',      label: 'All Platforms' },
-  { value: 'twitter',  label: 'Twitter / X'   },
   { value: 'linkedin', label: 'LinkedIn'       },
 ]
 
@@ -40,7 +39,7 @@ export default function PostsPage() {
     // Fetch all posts — no month filter for list view
     const now   = new Date()
     const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    fetchPosts({ month })
+    fetchPosts({ })
   }, [fetchPosts])
 
   // Client-side filter

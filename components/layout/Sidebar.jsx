@@ -9,6 +9,7 @@ import {
   LayoutDashboard, CalendarPlus, FileText,
   Link2, LogOut, X
 } from 'lucide-react'
+import NextImage from 'next/image'
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard'  },
@@ -30,12 +31,18 @@ export default function Sidebar({ onClose }) {
 
       {/* Logo */}
       <div className="flex items-center justify-between px-5 py-5">
-        <Link href="/dashboard" className="flex items-center gap-2.5 no-underline">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-white font-bold text-sm font-display">PS</span>
-          </div>
-          <span className="font-bold text-base text-white font-display">PostSaathi</span>
-        </Link>
+      <Link href="/dashboard" className="inline-flex items-center gap-2.5 no-underline">
+            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
+              <NextImage
+                src="/icon.png"
+                alt="PostSaathi logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-xl font-bold text-white font-display">PostSaathi</span>
+          </Link>
         {/* Close button — mobile only */}
         {onClose && (
           <button

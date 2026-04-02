@@ -45,7 +45,7 @@ function StatCard({ label, value, icon: Icon, color }) {
 
 export default function DashboardPage() {
   const router              = useRouter()
-  const { posts, fetchPosts, loading, publishPost } = usePosts()
+  const { posts,totals, fetchPosts, loading, publishPost } = usePosts()
   const [selectedPost, setSelectedPost] = useState(null)
   const [publishing,   setPublishing]   = useState(false)
 
@@ -100,10 +100,10 @@ export default function DashboardPage() {
 
       {/* ── Stats row ─────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard label="Scheduled" value={stats.scheduled} icon={Clock}        color="bg-yellow-500/20" />
-        <StatCard label="Published" value={stats.published} icon={CheckCircle2} color="bg-green-500/20"  />
-        <StatCard label="Failed"    value={stats.failed}    icon={XCircle}      color="bg-red-500/20"    />
-        <StatCard label="Drafts"    value={stats.draft}     icon={FileText}      color="bg-white/10"      />
+        <StatCard label="Scheduled" value={totals.scheduled} icon={Clock}        color="bg-yellow-500/20" />
+        <StatCard label="Published" value={totals.published} icon={CheckCircle2} color="bg-green-500/20"  />
+        <StatCard label="Failed"    value={totals.failed}    icon={XCircle}      color="bg-red-500/20"    />
+        <StatCard label="Drafts"    value={totals.draft}     icon={FileText}      color="bg-white/10"      />
       </div>
 
       {/* ── Calendar card ─────────────────────────── */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { authApi, setGlobalLogout } from '@/lib/api'
 import { toast } from 'sonner'
@@ -8,14 +8,21 @@ import { toast } from 'sonner'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const router  = useRouter()
+  const router            = useRouter()
   const [user,    setUser]    = useState(null)
   const [loading, setLoading] = useState(true)
+
+  // ✅ Track if user was ever logged in this session
+  const wasLoggedIn = useRef(false)
 
   const logout = useCallback(async (showToast = false) => {
     try { await authApi.logout() } catch {}
     setUser(null)
-    if (showToast) toast.error('Session expired — please login again')
+    // ✅ Only show "session expired" if user was actually logged in before
+    if (showToast && wasLoggedIn.current) {
+      toast.error('Session expired — please login again')
+    }
+    wasLoggedIn.current = false
     router.push('/login')
   }, [router])
 
@@ -28,7 +35,10 @@ export function AuthProvider({ children }) {
       try {
         const data = await authApi.me()
         setUser(data.user)
+        // ✅ Mark as logged in only when me() succeeds
+        wasLoggedIn.current = true
       } catch {
+        // Not logged in — silently ignore, no toast
         setUser(null)
       } finally {
         setLoading(false)
@@ -37,21 +47,19 @@ export function AuthProvider({ children }) {
     init()
   }, [])
 
-  // ✅ login — success toast here, errors thrown back to page
   const login = useCallback(async (email, password) => {
     const data = await authApi.login({ email, password })
-    // Only reaches here if API call succeeded
     setUser(data.user)
+    wasLoggedIn.current = true  // ✅ Mark as logged in
     toast.success(`Welcome back, ${data.user.name}! 👋`)
     router.push('/dashboard')
     return data
   }, [router])
 
-  // ✅ register — success toast here, errors thrown back to page
   const register = useCallback(async (name, email, password) => {
     const data = await authApi.register({ name, email, password })
-    // Only reaches here if API call succeeded
     setUser(data.user)
+    wasLoggedIn.current = true  // ✅ Mark as logged in
     toast.success(`Welcome to PostSaathi, ${data.user.name}! 🎉`)
     router.push('/dashboard')
     return data

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react'
+import NextImage from 'next/image'
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -89,7 +90,18 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-
+        <Link href="/" className="inline-flex items-center gap-2.5 no-underline">
+            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20">
+              <NextImage
+                src="/icon.png"
+                alt="PostSaathi logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-xl font-bold text-white font-display">PostSaathi</span>
+          </Link>
           <h1 className="mt-6 text-2xl sm:text-3xl font-bold text-white font-display">
             Create your account
           </h1>
